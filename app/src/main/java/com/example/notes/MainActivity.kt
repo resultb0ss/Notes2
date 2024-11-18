@@ -43,6 +43,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -71,9 +72,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ScaffoldCreate() {
 
-    val notes = remember { mutableStateListOf<String>() }
-    val note = remember { mutableStateOf("") }
-    var selectedItem = remember { mutableStateOf("") }
+    val notes = rememberSaveable() { mutableStateListOf<String>() }
+    val note = rememberSaveable() { mutableStateOf("") }
+    var selectedItem = rememberSaveable() { mutableStateOf("") }
 
     val context = LocalContext.current
 
