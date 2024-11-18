@@ -1,6 +1,7 @@
 package com.example.notes
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -88,7 +89,7 @@ fun ScaffoldCreate() {
         )
     { innerPadding ->
         Column(modifier = Modifier.padding(innerPadding)) {
-            MyContent(note, notes){newValue -> selectedItem.value = newValue}
+            MyContent(note, notes) { newValue -> selectedItem.value = newValue }
         }
     }
 
@@ -105,7 +106,11 @@ fun CreateFAB(note: MutableState<String>, notes: MutableList<String>) {
 }
 
 @Composable
-fun MyContent(note: MutableState<String>, notes: MutableList<String>, updateField:(String)-> Unit) {
+fun MyContent(
+    note: MutableState<String>,
+    notes: MutableList<String>,
+    updateField: (String) -> Unit
+) {
 
     val context = LocalContext.current
 
@@ -140,10 +145,14 @@ fun MyContent(note: MutableState<String>, notes: MutableList<String>, updateFiel
                         .clip(RoundedCornerShape(20.dp))
                         .padding(8.dp)
                         .fillMaxWidth()
-                        .clickable( onClick = {
+                        .clickable(onClick = {
 
-                            Toast.makeText(context, "Выбрана заметка ${note}",
-                                Toast.LENGTH_SHORT).show()
+                            Toast
+                                .makeText(
+                                    context, "Выбрана заметка ${note}",
+                                    Toast.LENGTH_SHORT
+                                )
+                                .show()
                             val newValue = note
                             updateField(newValue)
                         }),
@@ -155,7 +164,10 @@ fun MyContent(note: MutableState<String>, notes: MutableList<String>, updateFiel
                             .padding(start = 8.dp)
                             .fillMaxWidth(0.9f)
                     )
-                    IconButton(onClick = { notes.removeAt(index) }, modifier = Modifier.fillMaxWidth(0.5f)) {
+                    IconButton(
+                        onClick = { notes.removeAt(index) },
+                        modifier = Modifier.fillMaxWidth(0.5f)
+                    ) {
                         Icon(Icons.Filled.Delete, contentDescription = "Delete")
                     }
                 }
@@ -183,13 +195,14 @@ fun TopBar(note: String, context: Context) {
         },
         actions = {
             IconButton(onClick = {
-                Toast.makeText(context, "Звонок Совершен контакту ${note}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Звонок Совершен контакту ${note}", Toast.LENGTH_SHORT)
+                    .show()
                 Log.d("@@@", "Звонок Совершен контакту ${note}")
             }
             ) { Icon(Icons.Filled.Call, contentDescription = "Звонок") }
 
             IconButton(onClick = {
-                java.lang.System.exit(0)
+                (context as? Activity)?.finishAffinity()
 
             }) { Icon(Icons.Filled.Close, contentDescription = "Закрыть") }
         },
@@ -204,12 +217,14 @@ fun TopBar(note: String, context: Context) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BottomBar(note: String,context: Context) {
+fun BottomBar(note: String, context: Context) {
     BottomAppBar(
         actions = {
             IconButton(onClick = {
-                Toast.makeText(context, "Сообщение отправлено контакту ${note}",
-                    Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context, "Сообщение отправлено контакту ${note}",
+                    Toast.LENGTH_SHORT
+                ).show()
                 Log.d("@@@", "Сообщение отправлено контакту ${note}")
             }) {
                 Icon(
@@ -218,9 +233,13 @@ fun BottomBar(note: String,context: Context) {
                 )
             }
             Spacer(modifier = Modifier.weight(1f, true))
-            IconButton(onClick = { Toast.makeText(context, "Отредактирована заметка ${note}",
-                Toast.LENGTH_SHORT).show()
-                Log.d("@@@", "Отредактирована заметка ${note}")})
+            IconButton(onClick = {
+                Toast.makeText(
+                    context, "Отредактирована заметка ${note}",
+                    Toast.LENGTH_SHORT
+                ).show()
+                Log.d("@@@", "Отредактирована заметка ${note}")
+            })
             { Icon(Icons.Filled.Edit, contentDescription = "Правка") }
         },
         containerColor = Color(red = 0, green = 134, blue = 69),
