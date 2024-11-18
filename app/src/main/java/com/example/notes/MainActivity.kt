@@ -22,15 +22,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -50,7 +56,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            myContent()
+
+            Column {
+                ScaffoldCreate()
+            }
+
         }
     }
 }
@@ -58,73 +68,108 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun myContent(){
+fun ScaffoldCreate(){
 
     val notes = remember { mutableStateListOf<String>() }
     val note = remember { mutableStateOf("") }
 
     Scaffold(
+        topBar = {TopBar()},
+        bottomBar = {BottomBar()},
 
         floatingActionButton = {
-            FloatingActionButton(onClick = {
-                notes.add(note.value)
-                note.value = ""
-            }) {
-                Icon(Icons.Filled.Add, contentDescription = "AddNote")
-            }
+           CreateFAB(note, notes)
         },
 
-        content = {
-            Column(modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(top = 100.dp, start = 10.dp, end = 10.dp)
-                .background(Color.LightGray))
-            {
-                Column(modifier = Modifier.border(color = Color.Black, width = 1.dp)){
-                    Row (modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color.DarkGray),
-                        horizontalArrangement = Arrangement.Center){
-                        Text(text = "Заметки",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White, modifier = Modifier.padding(8.dp))
-                    }
-                    TextField(value = note.value,
-                        modifier = Modifier.fillMaxWidth(),
-                        onValueChange = { newText -> note.value = newText})
-                }
+    )
+    { innerPadding ->
+        Column (modifier = Modifier.padding(innerPadding)){
+            MyContent(note,notes)
+        }
+    }
 
-                Spacer(Modifier.padding(8.dp))
+}
 
-                LazyColumn (modifier = Modifier
-                    .background(color = Color.LightGray)
-                    .padding(start = 8.dp, end = 8.dp)) {
-                    itemsIndexed(notes){
-                            index, note ->
-                        Row(modifier = Modifier
-                            .background(Color.White, shape = RoundedCornerShape(20.dp))
-                            .clip(RoundedCornerShape(20.dp))
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = note, fontSize = 18.sp, fontWeight = FontWeight.Normal,
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                                    .fillMaxWidth(0.9f))
-                            IconButton( onClick = {notes.removeAt(index)}, modifier = Modifier.fillMaxWidth(0.5f)) {
-                                Icon(Icons.Filled.Delete, contentDescription = "Delete")
-                            }
-                        }
-                        Spacer(modifier = Modifier.padding(8.dp))
+@Composable
+fun CreateFAB(note: MutableState<String>,notes: MutableList<String>){
+    FloatingActionButton(onClick = {
+        notes.add(note.value)
+        note.value = ""
+    }) {
+        Icon(Icons.Filled.Add, contentDescription = "AddNote")
+    }
+}
 
-                    }
-                }
+@Composable
+fun MyContent(note: MutableState<String>,notes: MutableList<String>){
+    Column(modifier =
+    Modifier
+        .fillMaxSize()
+        .padding( start = 10.dp, end = 10.dp)
+        .background(Color(red = 198, green = 247, blue = 223)))
+    {
+        Column(){
 
+            OutlinedTextField(value = note.value,
+                modifier = Modifier.fillMaxWidth().padding(10.dp),
+                onValueChange = { newText -> note.value = newText})
+        }
+
+        Spacer(Modifier.padding(8.dp))
+
+        LazyColumn (modifier = Modifier
+            .padding(start = 8.dp, end = 8.dp)) {
+            itemsIndexed(notes){
+                    index, note ->
+                ItemListRowNote(note,index,notes)
+                Spacer(modifier = Modifier.padding(8.dp))
 
             }
         }
-    )
 
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(){
+    TopAppBar (
+        colors = topAppBarColors(
+            containerColor = Color(red = 0, green = 135, blue = 70),
+            titleContentColor = Color.White
+        ),
+        title = {
+            Text("Заметки")
+        }
+    )
+}
+
+@Composable
+fun BottomBar(){
+    BottomAppBar(
+        containerColor = Color(red = 0, green = 135, blue = 70),
+        contentColor = Color.White,
+    ) {
+        Text(modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, text = "BottomAppBar",)
+
+    }
+}
+
+@Composable
+fun ItemListRowNote(note: String, index: Int, notes: MutableList<String>){
+    Row(modifier = Modifier
+        .background(Color.White, shape = RoundedCornerShape(20.dp))
+        .clip(RoundedCornerShape(20.dp))
+        .padding(8.dp)
+        .fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(text = note, fontSize = 18.sp, fontWeight = FontWeight.Normal,
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .fillMaxWidth(0.9f))
+        IconButton( onClick = {notes.removeAt(index)}, modifier = Modifier.fillMaxWidth(0.5f)) {
+            Icon(Icons.Filled.Delete, contentDescription = "Delete")
+        }
+    }
 }
